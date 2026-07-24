@@ -12,7 +12,7 @@ pipeline {
             steps {
                 sh '''
                     docker rm -f website || true
-                    docker run -d --name website -p 8081:80 static-site:v1
+                    docker run -d --name website -p 8082:80 static-site:v1
                 '''
             }
         }
