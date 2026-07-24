@@ -2,9 +2,9 @@ pipeline {
     agent any
 
     stages {
-        stage('Hello') {
+        stage('Build Image') {
             steps {
-                echo 'Hello from Jenkins!'
+                sh 'docker build -t jenkins-web:v1 .'
             }
         }
     }
