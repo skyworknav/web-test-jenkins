@@ -1,13 +1,13 @@
 pipeline {
     agent any
-
+//BUILD IMAGE
     stages {
         stage('Build Image') {
             steps {
                 sh 'docker build -t static-site:v1 .'
             }
         }
-
+//DEPLOYMENT PART
         stage('Deploy') {
             steps {
                 sh '''
