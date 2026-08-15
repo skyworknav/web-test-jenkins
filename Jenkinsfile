@@ -1,18 +1,26 @@
 pipeline {
     agent any
-//BUILD IMAGE
+
+    environment {
+        REGISTRY = '192.168.56.30:5000'
+        IMAGE = 'static-site'
+        TAG = "${BUILD_NUMBER}"
+    }
+
     stages {
+
         stage('Build Image') {
             steps {
-                sh 'docker build -t static-site:v1 .'
+                sh '''
+                    docker build -t ${REGISTRY}/${IMAGE}:${TAG} .
+                '''
             }
         }
-//DEPLOYMENT PART
-        stage('Deploy') {
+
+        stage('Push Image') {
             steps {
                 sh '''
-                    docker rm -f website || true
-                    docker run -d --name website -p 8082:80 static-site:v1
+                    docker push ${REGISTRY}/${IMAGE}:${TAG}
                 '''
             }
         }
