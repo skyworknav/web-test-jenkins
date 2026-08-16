@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: static-site-staging
+  namespace: staging
+  labels:
+    app: static-site-staging
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: static-site-staging
+  template:
+    metadata:
+      labels:
+        app: static-site-staging
+    spec:
+      containers:
+        - name: static-site
+          image: 192.168.56.30:5000/static-site:STAGING
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 80
