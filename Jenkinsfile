@@ -6,7 +6,7 @@ pipeline {
         REGISTRY = '192.168.56.30:5000'
         IMAGE = 'static-site'
         IMAGE_TAG = "${BUILD_NUMBER}"
-        GIT_CREDENTIALS = 'github-pat'
+        GIT_CREDENTIALS = 'github-credentials'
     }
 
     stages {
