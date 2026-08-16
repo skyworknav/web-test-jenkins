@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
         - name: static-site
-          image: 192.168.56.30:5000/static-site:3f0159a
+          image: 192.168.56.30:5000/static-site:0dccf07
           imagePullPolicy: Always
           ports:
             - containerPort: 80
