@@ -1,3 +1,4 @@
+```groovy
 pipeline {
     agent any
 
@@ -5,7 +6,7 @@ pipeline {
         REGISTRY = '192.168.56.30:5000'
         IMAGE = 'static-site'
         IMAGE_TAG = "${BUILD_NUMBER}"
-        KUBECONFIG = '/etc/jenkins/kubeconfig'
+        GIT_CREDENTIALS = 'github-pat'
     }
 
     stages {
@@ -28,21 +29,35 @@ pipeline {
             }
         }
 
-        stage('Deploy to Kubernetes') {
+        stage('Update GitOps Manifest') {
             steps {
-                sh '''
-                    kubectl --kubeconfig=${KUBECONFIG} \
-                      set image deployment/static-site \
-                      static-site=${REGISTRY}/${IMAGE}:${IMAGE_TAG} \
-                      -n default
+                withCredentials([
+                    usernamePassword(
+                        credentialsId: "${GIT_CREDENTIALS}",
+                        usernameVariable: 'GIT_USERNAME',
+                        passwordVariable: 'GIT_PASSWORD'
+                    )
+                ]) {
+                    sh '''
+                        git config user.name "Jenkins"
+                        git config user.email "jenkins@localhost"
 
-                    kubectl --kubeconfig=${KUBECONFIG} \
-                      rollout status deployment/static-site \
-                      -n default \
-                      --timeout=120s
-                '''
+                        git fetch origin main
+                        git checkout main
+                        git reset --hard origin/main
+
+                        sed -i "s#image: ${REGISTRY}/${IMAGE}:[0-9]*#image: ${REGISTRY}/${IMAGE}:${IMAGE_TAG}#" k8s/deployment.yaml
+
+                        git add k8s/deployment.yaml
+
+                        git commit -m "Update static-site image to ${IMAGE_TAG}" || true
+
+                        git push https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/skyworknav/web-test-jenkins.git HEAD:main
+                    '''
+                }
             }
         }
 
     }
 }
+```
